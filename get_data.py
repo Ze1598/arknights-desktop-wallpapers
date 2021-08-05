@@ -42,6 +42,10 @@ final_df["art_type"] = final_df["art_type"].map(
         else "Elite 0" if art_type == "e0_img"
         else art_type
 )
+
+# Add a final column with a display name for the art
+final_df["display_name"] = final_df.apply(lambda row: f'{row["name"]} ({row["art_type"]})', axis=1)
+
 print(final_df)
 print(final_df.columns)
 final_df.to_csv("operator_art_dataset.csv", index=False)

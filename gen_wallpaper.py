@@ -2,7 +2,7 @@ from PIL import Image
 from colorthief import ColorThief
 import requests
 from io import BytesIO
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from requests.models import Response
 import pandas as pd
 import os
@@ -33,6 +33,40 @@ def prepare_op_art(res: Response) -> any:
     return op_art
 
 
+def wallpaper_gen(art_info: Dict) -> str:
+    ART_COORD = (700, 0)
+    SHADOW_OFFSET = (10, 10)
+    SHADOW_COORD = tuple(ART_COORD[i] + SHADOW_OFFSET[i] for i in range(len(ART_COORD)))
+
+    # Set up the file name and save path
+    wallpaper_name = f"{art_info['display_name']}.png"
+    wallpaper_path = os.path.join(os.getcwd(), wallpaper_name)
+
+    print("Creating", wallpaper_name)
+
+    # Request the operator art
+    img_res = request_image(art_info["art_url"])
+    # Generate a colour pallette based on the most dominant colours
+    palette = get_colour_palette(img_res)
+    main_colour = palette[0]
+    op_art = prepare_op_art(img_res)
+
+    # Create a new image
+    wallpaper = Image.new("RGBA", (1920, 1080), color=main_colour)
+
+    # Generate the black shadow and add it to the wallpaper
+    shadow = Image.new("RGBA", op_art.size, color="black")
+    wallpaper.paste(shadow, SHADOW_COORD, mask=op_art)
+    
+    # Now paste the actual operator art
+    wallpaper.paste(op_art, ART_COORD, mask=op_art)
+
+    # Finally save the result
+    wallpaper.save(wallpaper_path)
+
+    return wallpaper_name
+
+
 if __name__ == "__main__":
     ART_COORD = (700, 0)
     SHADOW_OFFSET = (10, 10)
@@ -44,6 +78,28 @@ if __name__ == "__main__":
     # operator = "https://gamepress.gg/arknights/sites/arknights/files/2020-10/char_250_phatom_ghost%231.png"
     # operator = "https://gamepress.gg/arknights/sites/arknights/files/2019-11/char_172_svrash_2.png"
     # operator = "https://gamepress.gg/arknights/sites/arknights/files/2020-08/char_2013_cerber_summer%234.png"
+    
+    wallpaper_name = "test.png"
+    wallpaper_path = os.path.join(os.getcwd(), wallpaper_name)
+
+    """
+    print("Creating", wallpaper_name)
+    # Request the operator art
+    img_res = request_image(operator)
+    # Generate a colour pallette based on the most dominant colours
+    palette = get_colour_palette(img_res)
+    main_colour = palette[0]
+    op_art = prepare_op_art(img_res)
+
+    wallpaper = Image.new("RGBA", (1920, 1080), color=main_colour)
+
+    shadow = Image.new("RGBA", op_art.size, color="black")
+    wallpaper.paste(shadow, SHADOW_COORD, mask=op_art)
+    
+    wallpaper.paste(op_art, ART_COORD, mask=op_art)
+
+    wallpaper.save(wallpaper_path)
+    """
 
     data = pd.read_csv("operator_art_dataset.csv")
     for operator_row in data.iterrows():
