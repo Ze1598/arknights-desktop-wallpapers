@@ -74,6 +74,8 @@ art_chosen = st.selectbox(
 art_chosen_dict = filtered_data[filtered_data["display_name"] == art_chosen].to_dict("records")[
     0]
 
+# chosen_colour = st.color_picker("Optionally change the background colour")
+
 # Generate the wallpaper and return the file name
 wallpaper_name = gen_wallpaper.wallpaper_gen(art_chosen_dict)
 
