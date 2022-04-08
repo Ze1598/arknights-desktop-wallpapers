@@ -71,8 +71,7 @@ art_chosen = st.selectbox(
 )
 
 # to_dict generates a list of dicts, but we know there will be a single row (dict)
-art_chosen_dict = filtered_data[filtered_data["display_name"] == art_chosen].to_dict("records")[
-    0]
+art_chosen_dict = filtered_data[filtered_data["display_name"] == art_chosen].to_dict("records")[0]
 
 # chosen_colour = st.color_picker("Optionally change the background colour")
 
